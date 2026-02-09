@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Study Planner</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>📚 StudyFlow</h1>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" onclick="showSection('dashboard')">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" onclick="showSection('subjects', this)">
+                    <span class="icon">📖</span>
+                    <span>Subjects</span>
+                </button>
+                <button class="nav-item" onclick="showSection('schedule', this)">
+                    <span class="icon">📅</span>
+                    <span>Schedule</span>
+                </button>
+                <button class="nav-item" onclick="showSection('tasks', this)">
+                    <span class="icon">✓</span>
+                    <span>Tasks</span>
+                </button>
+                <!-- <button class="nav-item" onclick="showSection('analytics', this)">
+                    <span class="icon">📈</span>
+                    <span>Analytics</span>
+                </button> -->
+                <button class="nav-item" onclick="showSection('settings', this)">
+                    <span class="icon">⚙️</span>
+                    <span>Settings</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <header class="section-header">
+                    <h2>Dashboard</h2>
+                    <p class="current-date" id="current-date"></p>
+                </header>
+
+                <div class="dashboard-grid">
+                    <!-- Stats Cards -->
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-content">
+                                <h3 id="total-subjects">0</h3>
+                                <p>Active Subjects</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✓</div>
+                            <div class="stat-content">
+                                <h3 id="pending-tasks">0</h3>
+                                <p>Pending Tasks</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏰</div>
+                            <div class="stat-content">
+                                <h3 id="study-hours">0h</h3>
+                                <p>Study Hours This Week</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-content">
+                                <h3 id="completion-rate">0%</h3>
+                                <p>Completion Rate</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Schedule -->
+                    <div class="dashboard-card">
+                        <h3>Today's Schedule</h3>
+                        <div id="today-schedule" class="schedule-list">
+                            <p class="empty-state">No sessions scheduled for today</p>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Deadlines -->
+                    <div class="dashboard-card">
+                        <h3>Upcoming Deadlines</h3>
+                        <div id="upcoming-deadlines" class="deadline-list">
+                            <p class="empty-state">No upcoming deadlines</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Subjects Section -->
+            <section id="subjects" class="content-section">
+                <header class="section-header">
+                    <h2>Subject Management</h2>
+                    <button class="btn-primary" onclick="openSubjectModal()">+ Add Subject</button>
+                </header>
+
+                <div id="subjects-grid" class="subjects-grid">
+                    <p class="empty-state">No subjects added yet. Click "Add Subject" to get started.</p>
+                </div>
+            </section>
+
+            <!-- Schedule Section -->
+            <section id="schedule" class="content-section">
+                <header class="section-header">
+                    <h2>Schedule Planner</h2>
+                    <button class="btn-primary" onclick="openScheduleModal()">+ Add Session</button>
+                </header>
+
+                <div id="schedule-container">
+                    <!-- <div class="week-navigation">
+                        <span id="current-week">Current Week</span>
+                    </div>
+                    <div id="schedule-grid" class="schedule-grid"></div> -->
+                    <div id="schedule-list" class="schedule-list"></div>
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section id="tasks" class="content-section">
+                <header class="section-header">
+                    <h2>Task Manager</h2>
+                    <button class="btn-primary" onclick="openTaskModal()">+ Add Task</button>
+                </header>
+
+                <div class="task-filters">
+                    <button class="filter-btn active" onclick="filterTasks('all')">All</button>
+                    <button class="filter-btn" onclick="filterTasks('assignment')">Assignments</button>
+                    <button class="filter-btn" onclick="filterTasks('exam')">Exams</button>
+                    <button class="filter-btn" onclick="filterTasks('project')">Projects</button>
+                    <button class="filter-btn" onclick="filterTasks('other')">Other</button>
+                </div>
+
+                <div id="tasks-container" class="tasks-container">
+                    <p class="empty-state">No tasks added yet. Click "Add Task" to create one.</p>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <!-- <section id="analytics" class="content-section">
+                <header class="section-header">
+                    <h2>Progress Analytics</h2>
+                </header>
+
+                <div class="analytics-grid">
+                    <div class="chart-card">
+                        <h3>Study Time Distribution</h3>
+                        <canvas id="subject-chart" width="400" height="300"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Task Completion</h3>
+                        <canvas id="completion-chart" width="400" height="300"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Weekly Study Hours</h3>
+                        <canvas id="weekly-chart" width="400" height="300"></canvas>
+                    </div>
+                    <div class="insights-card">
+                        <h3>Insights & Recommendations</h3>
+                        <div id="insights-content"></div>
+                    </div>
+                </div>
+            </section> -->
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <header class="section-header">
+                    <h2>Settings</h2>
+                </header>
+
+                <div class="settings-container">
+                    <div class="settings-group">
+                        <h3>Appearance</h3>
+                        <div class="setting-item">
+                            <label for="theme-select">Theme</label>
+                            <select id="theme-select" onchange="changeTheme()">
+                                <option value="light">Light</option>
+                                <option value="dark">Dark</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Data Management</h3>
+                        <div class="setting-item">
+                            <button class="btn-secondary" onclick="exportData()">Export Data (JSON)</button>
+                            <p class="help-text">Download all your data as a backup</p>
+                        </div>
+                        <div class="setting-item">
+                            <button class="btn-secondary" onclick="document.getElementById('import-file').click()">Import Data</button>
+                            <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
+                            <p class="help-text">Restore data from a backup file</p>
+                        </div>
+                        <div class="setting-item">
+                            <button class="btn-danger" onclick="resetData()">Reset All Data</button>
+                            <p class="help-text">Permanently delete all subjects, schedules, and tasks</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>About</h3>
+                        <p class="about-text">Smart Study Planner v1.0</p>
+                        <p class="about-text">Built with HTML, CSS, and JavaScript</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Subject Modal -->
+    <div id="subject-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="subject-modal-title">Add Subject</h3>
+                <button class="close-modal" onclick="closeModal('subject-modal')">&times;</button>
+            </div>
+            <form id="subject-form" onsubmit="saveSubject(event)">
+                <div class="form-group">
+                    <label for="subject-name">Subject Name *</label>
+                    <input type="text" id="subject-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject-code">Subject Code</label>
+                    <input type="text" id="subject-code" placeholder="e.g., CS101">
+                </div>
+                <div class="form-group">
+                    <label for="subject-color">Color</label>
+                    <input type="color" id="subject-color" value="#3b82f6">
+                </div>
+                <div class="form-group">
+                    <label for="subject-priority">Priority *</label>
+                    <select id="subject-priority" required>
+                        <option value="high">High</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="subject-notes">Description</label>
+                    <textarea id="subject-notes" rows="3" placeholder="Additional notes..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('subject-modal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Subject</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="task-modal-title">Add Task</h3>
+                <button class="close-modal" onclick="closeModal('task-modal')">&times;</button>
+            </div>
+            <form id="task-form" onsubmit="saveTask(event)">
+                <div class="form-group">
+                    <label for="task-title">Title *</label>
+                    <input type="text" id="task-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-subject">Subject *</label>
+                    <select id="task-subject" required>
+                        <option value="">Select a subject</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-type">Type *</label>
+                    <select id="task-type" required>
+                        <option value="assignment">Assignment</option>
+                        <option value="exam">Exam</option>
+                        <option value="project">Project</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-deadline">Deadline *</label>
+                    <input type="datetime-local" id="task-deadline" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-priority">Priority</label>
+                    <select id="task-priority">
+                        <option value="high">High</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Description</label>
+                    <textarea id="task-description" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('task-modal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
