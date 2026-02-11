@@ -306,6 +306,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
+    /* color: black; */
 }
 
 .schedule-item, .deadline-item {
@@ -480,23 +481,34 @@ body {
 .day-header {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #444;
+    color: var(--text-primary);
     margin-bottom: 10px;
     border-bottom: 2px solid #eee;
     padding-bottom: 5px;
 }
 .schedule-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    background: #fff;
-    border-left: 5px solid #ccc; /* Default color */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    /* display: flex; */
+    /* justify-content: space-between;
+    align-items: center; */
+    /* padding: 12px; */
+    /* margin-bottom: 8px; */
+    /* border-radius: 8px; */
+    /* background: #fff; */
+    /* border-left: 5px solid #ccc; */
+    /* box-shadow: 0 2px 4px rgba(0,0,0,0.05); */
     cursor: pointer;
-    transition: transform 0.2s;
+    /* transition: transform 0.2s; */
+
+    background: var(--bg-tertiary);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border);
+    border-left: 5px solid var(--subject-color, var(--primary));
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--spacing-lg);
+    align-items: start;
+    transition: var(--transition);
 }
 .schedule-card:hover {
     transform: translateY(-2px);

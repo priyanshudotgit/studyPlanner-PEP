@@ -621,7 +621,7 @@ function findTaskById(id, tasks) {
 
 // update subject dropdowns
 function updateSubjectDropdowns() {
-    let subjects = getFromStorage('subjects');
+    let subjects = getFromStorage('subjects') || [];
     let selects = ['session-subject', 'task-subject'];
     
     for (let s = 0; s < selects.length; s++) {
@@ -649,4 +649,234 @@ function closeModal(modalId) {
         modal.classList.remove('active');
     }
     currentEditingId = null;
+}
+
+// update schedule page
+function displaySchedule() {
+    if (typeof updateSubjectDropdowns === 'function') updateSubjectDropdowns(); 
+    renderScheduleList();
+}
+
+// schedule list display
+function renderScheduleList() {
+    const container = document.getElementById('schedule-list');
+    const schedules = getFromStorage('schedules') || [];
+    const subjects = getFromStorage('subjects') || [];
+    
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    let html = '';
+
+    days.forEach(day => {
+        const dayKey = day.toLowerCase();
+        
+        const daySchedules = schedules.filter((s) => s.day === dayKey);
+        
+        daySchedules.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+        if (daySchedules.length > 0) {
+            html += `<div class="day-group">`;
+            html += `<div class="day-header">${day}</div>`;
+            
+            daySchedules.forEach(schedule => {
+                const subject = findSubjectById(schedule.subjectId, subjects);
+                const color = subject?.color || '#3b82f6';
+                const name = subject?.name || 'Unknown Subject';
+
+                html += `
+                    <div class="schedule-card" 
+                            style="border-left-color: ${color};" 
+                            onclick="editSchedule('${schedule.id}')">
+                        <div>
+                            <strong>${name}</strong>
+                            <div style="font-size: 0.85em; margin-top: 4px;">
+                                ${schedule.type}
+                            </div>
+                        </div>
+                        <div style="font-weight: 500;">
+                            ${formatTime(schedule.startTime)} - ${formatTime(schedule.endTime)}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+        }
+    });
+
+    if (html === '') {
+        html = '<p style="text-align:center; color:#888; margin-top:30px;">No schedules added yet.</p>';
+    }
+
+    container.innerHTML = html;
+}
+
+// Helper to make time look nice (09:00 -> 9:00 AM)
+// If you prefer 24h, you can remove this.
+function formatTime(timeStr) {
+    const [hour, minute] = timeStr.split(':');
+    const h = parseInt(hour);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${h12}:${minute} ${ampm}`;
+}
+
+// Keep your existing Save/Edit logic, just update the render call
+function saveSchedule(event) {
+    event.preventDefault();
+    
+    // ... (Your existing logic for collecting form data) ...
+    // ... (Your existing logic for conflict checking) ...
+
+    // AFTER saving/updating data:
+    closeModal('schedule-modal');
+    displaySchedule(); // This now calls the new List renderer
+    
+    // Optional: Update dashboard if needed
+    if (typeof displayDashboard === 'function') displayDashboard();
+}
+
+// Keep your existing open/close modal functions
+// Keep your existing checkScheduleConflict function
+
+// Function to generate time slots from 8 AM to 8 PM
+function generateTimeSlots() {
+    var slots = [];
+    for (var hour = 8; hour <= 20; hour++) {
+        slots.push(hour.toString().padStart(2, '0') + ':00');
+    }
+    return slots;
+}
+
+// Function to get sessions for a specific day and time
+function getSessionsForDayAndTime(day, time, schedules, subjects) {
+    var html = '';
+    var hour = parseInt(time.split(':')[0]);
+    
+    for (var i = 0; i < schedules.length; i++) {
+        var schedule = schedules[i];
+        if (schedule.day === day) {
+            var startHour = parseInt(schedule.startTime.split(':')[0]);
+            if (startHour === hour) {
+                var subject = findSubjectById(schedule.subjectId, subjects);
+                var subjectName = subject ? subject.name : 'Unknown';
+                var subjectColor = subject ? subject.color : '#3b82f6';
+                
+                html += '<div class="session-block" style="border-color: ' + subjectColor + '; background: ' + subjectColor + '20" onclick="editSchedule(\'' + schedule.id + '\')">';
+                html += '<div class="session-title">' + subjectName + '</div>';
+                html += '<div class="session-time">' + schedule.startTime + '-' + schedule.endTime + '</div>';
+                html += '<button class="btn-icon" value="edit" onclick="openTaskModal(\'' + task.id + '\')">✏️</button>';
+                html += '<button class="btn-icon" onclick="deleteTask(\'' + task.id + '\')">🗑️</button>';
+                html += '</div>';
+            }
+        }
+    }
+    
+    return html;
+}
+
+// Function to open schedule modal
+function openScheduleModal(scheduleId) {
+    currentEditingId = scheduleId || null;
+    var modal = document.getElementById('schedule-modal');
+    var form = document.getElementById('schedule-form');
+    
+    form.reset();
+    document.getElementById('conflict-warning').style.display = 'none';
+    
+    if (scheduleId) {
+        // Edit mode
+        var schedules = getFromStorage('schedules');
+        var schedule = findScheduleById(scheduleId, schedules);
+        
+        if (schedule) {
+            document.getElementById('session-subject').value = schedule.subjectId;
+            document.getElementById('session-day').value = schedule.day;
+            document.getElementById('session-start').value = schedule.startTime;
+            document.getElementById('session-end').value = schedule.endTime;
+            document.getElementById('session-type').value = schedule.type;
+        }
+    }
+    
+    modal.classList.add('active');
+}
+
+// Function to save schedule
+function saveSchedule(event) {
+    event.preventDefault();
+    
+    var schedules = getFromStorage('schedules') || [];
+    
+    var scheduleData = {
+        subjectId: document.getElementById('session-subject').value,
+        day: document.getElementById('session-day').value,
+        startTime: document.getElementById('session-start').value,
+        endTime: document.getElementById('session-end').value,
+        type: document.getElementById('session-type').value
+    };
+    
+    // Check for conflicts
+    // var hasConflict = checkScheduleConflict(scheduleData.day, scheduleData.startTime, scheduleData.endTime, currentEditingId);
+    
+    // if (hasConflict) {
+    //     document.getElementById('conflict-warning').textContent = 'Warning: This session conflicts with an existing schedule!';
+    //     document.getElementById('conflict-warning').style.display = 'block';
+    //     return;
+    // }
+    
+    if (currentEditingId) {
+        // Update existing schedule
+        for (var i = 0; i < schedules.length; i++) {
+            if (schedules[i].id === currentEditingId) {
+                schedules[i] = Object.assign(schedules[i], scheduleData);
+                break;
+            }
+        }
+        alert('Schedule updated successfully!');
+    } else {
+        // Add new schedule
+        scheduleData.id = 'sch_' + Date.now();
+        schedules.push(scheduleData);
+        alert('Schedule added successfully!');
+    }
+    
+    saveToStorage('schedules', schedules);
+    closeModal('schedule-modal');
+    displaySchedule();
+}
+
+// Function to check for schedule conflicts
+function checkScheduleConflict(day, startTime, endTime, excludeId) {
+    var schedules = getFromStorage('schedules') || [];
+    
+    for (var i = 0; i < schedules.length; i++) {
+        var schedule = schedules[i];
+        
+        // Skip if it's the same schedule we're editing
+        if (excludeId && schedule.id === excludeId) {
+            continue;
+        }
+        
+        // Check if same day
+        if (schedule.day !== day) {
+            continue;
+        }
+        
+        // Convert times to minutes for comparison
+        var scheduleStart = timeToMinutes(schedule.startTime);
+        var scheduleEnd = timeToMinutes(schedule.endTime);
+        var newStart = timeToMinutes(startTime);
+        var newEnd = timeToMinutes(endTime);
+        
+        // Check for overlap
+        if (newStart < scheduleEnd && newEnd > scheduleStart) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+// Function to edit schedule
+function editSchedule(scheduleId) {
+    openScheduleModal(scheduleId);
 }
