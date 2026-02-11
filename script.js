@@ -741,6 +741,13 @@ function closeModal(modalId) {
     currentEditingId = null;
 }
 
+// Toggle sidebar visibility on mobile
+function toggleMobileSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+    sidebar.classList.toggle('mobile-open');
+}
+
 // update schedule page
 function displaySchedule() {
     if (typeof updateSubjectDropdowns === 'function') updateSubjectDropdowns(); 

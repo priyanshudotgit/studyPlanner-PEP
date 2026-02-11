@@ -923,10 +923,12 @@ form {
 
 @media (max-width: 768px) {
     .app-container {
+        padding-top: 40px;
         grid-template-columns: 1fr;
     }
     
     .sidebar {
+        padding-top: 70px;
         position: fixed;
         left: -260px;
         z-index: 100;
@@ -963,6 +965,27 @@ form {
     .form-row {
         grid-template-columns: 1fr;
     }
+}
+
+/* Mobile hamburger button */
+.mobile-hamburger {
+    display: none;
+    position: fixed;
+    left: 12px;
+    top: 12px;
+    z-index: 1100;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 8px 20px var(--shadow);
+}
+
+@media (max-width: 768px) {
+    .mobile-hamburger { display: block; }
 }
 
 /* Analytics styles */
