@@ -30,10 +30,10 @@
                     <span class="icon">✓</span>
                     <span>Tasks</span>
                 </button>
-                <!-- <button class="nav-item" onclick="showSection('analytics', this)">
+                <button class="nav-item" onclick="showSection('analytics', this)">
                     <span class="icon">📈</span>
                     <span>Analytics</span>
-                </button> -->
+                </button>
                 <button class="nav-item" onclick="showSection('settings', this)">
                     <span class="icon">⚙️</span>
                     <span>Settings</span>
@@ -150,30 +150,40 @@
             </section>
 
             <!-- Analytics Section -->
-            <!-- <section id="analytics" class="content-section">
+            <section id="analytics" class="content-section">
                 <header class="section-header">
                     <h2>Progress Analytics</h2>
                 </header>
 
                 <div class="analytics-grid">
                     <div class="chart-card">
-                        <h3>Study Time Distribution</h3>
-                        <canvas id="subject-chart" width="400" height="300"></canvas>
+                        <h3>Overall Completion</h3>
+                        <div id="overall-progress" class="progress"><div class="progress-fill" style="width:0%"></div></div>
+                        <p id="overall-text" style="margin-top:8px; color:var(--text-secondary)">0/0 tasks completed (0%)</p>
                     </div>
+
                     <div class="chart-card">
-                        <h3>Task Completion</h3>
-                        <canvas id="completion-chart" width="400" height="300"></canvas>
+                        <h3>Completion by Subject</h3>
+                        <div id="by-subject" style="margin-top:12px">
+                            <p class="empty-state">No subjects available</p>
+                        </div>
                     </div>
+
                     <div class="chart-card">
-                        <h3>Weekly Study Hours</h3>
-                        <canvas id="weekly-chart" width="400" height="300"></canvas>
+                        <h3>Completion by Priority</h3>
+                        <div id="by-priority" style="margin-top:12px">
+                            <p class="empty-state">No tasks yet</p>
+                        </div>
                     </div>
+
                     <div class="insights-card">
-                        <h3>Insights & Recommendations</h3>
-                        <div id="insights-content"></div>
+                        <h3>Insights</h3>
+                        <div id="insights-content" style="margin-top:8px">
+                            <p class="empty-state">No data to show insights</p>
+                        </div>
                     </div>
                 </div>
-            </section> -->
+            </section>
 
             <!-- Settings Section -->
             <section id="settings" class="content-section">

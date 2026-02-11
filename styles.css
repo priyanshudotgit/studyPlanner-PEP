@@ -964,3 +964,70 @@ form {
         grid-template-columns: 1fr;
     }
 }
+
+/* Analytics styles */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+}
+
+.chart-card, .insights-card {
+    background: var(--bg-tertiary);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border);
+}
+
+.progress {
+    background: var(--bg-secondary);
+    height: 16px;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--primary);
+    transition: width 0.6s ease;
+}
+
+.bar-wrap {
+    margin-bottom: var(--spacing-md);
+}
+
+.bar-label {
+    font-size: 0.95rem;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+}
+
+.bar {
+    background: var(--bg-secondary);
+    height: 12px;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--primary);
+    transition: width 0.6s ease;
+}
+
+.insights-card p {
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-secondary);
+}
+
+@media (max-width: 1024px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -187,6 +187,96 @@ function displayUpcomingDeadlines() {
     }
 }
 
+// Simple analytics renderer (progress bars + insights)
+function updateAnalytics() {
+    let tasks = getFromStorage('tasks') || [];
+    let subjects = getFromStorage('subjects') || [];
+
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.completed).length;
+    const percent = total ? Math.round((completed / total) * 100) : 0;
+
+    const overallText = document.getElementById('overall-text');
+    if (overallText) overallText.textContent = `${completed}/${total} tasks completed (${percent}%)`;
+
+    const overallFill = document.querySelector('#overall-progress .progress-fill');
+    if (overallFill) overallFill.style.width = percent + '%';
+
+    // By subject: show completion percent per subject
+    const bySubjectContainer = document.getElementById('by-subject');
+    if (bySubjectContainer) {
+        bySubjectContainer.innerHTML = '';
+        if (subjects.length === 0) {
+            bySubjectContainer.innerHTML = '<p class="empty-state">No subjects available</p>';
+        } else {
+            subjects.forEach(subj => {
+                const subTasks = tasks.filter(t => t.subjectId === subj.id);
+                const subTotal = subTasks.length;
+                const subCompleted = subTasks.filter(t => t.completed).length;
+                const subPercent = subTotal ? Math.round((subCompleted / subTotal) * 100) : 0;
+                renderBar(bySubjectContainer, `${subj.name} (${subCompleted}/${subTotal})`, subPercent, subj.color || 'var(--primary)');
+            });
+        }
+    }
+
+    // By priority
+    const byPriorityContainer = document.getElementById('by-priority');
+    if (byPriorityContainer) {
+        byPriorityContainer.innerHTML = '';
+        const priorities = ['high', 'medium', 'low'];
+        priorities.forEach(p => {
+            const pTasks = tasks.filter(t => (t.priority || 'medium') === p);
+            const pTotal = pTasks.length;
+            const pCompleted = pTasks.filter(t => t.completed).length;
+            const pPercent = pTotal ? Math.round((pCompleted / pTotal) * 100) : 0;
+            const color = p === 'high' ? '#ef4444' : (p === 'medium' ? '#f59e0b' : '#3b82f6');
+            renderBar(byPriorityContainer, `${p.charAt(0).toUpperCase() + p.slice(1)} (${pCompleted}/${pTotal})`, pPercent, color);
+        });
+        if (tasks.length === 0) byPriorityContainer.innerHTML = '<p class="empty-state">No tasks yet</p>';
+    }
+
+    // Insights (simple recommendations)
+    const insightsEl = document.getElementById('insights-content');
+    if (insightsEl) {
+        let lines = [];
+        if (total === 0) {
+            lines.push('No tasks yet. Add tasks to see analytics.');
+        } else {
+            if (percent < 50) lines.push('Overall completion is below 50% — try finishing high-priority tasks first.');
+            else lines.push('Good progress! Keep completing tasks to maintain momentum.');
+
+            // find subject with lowest completion (with tasks)
+            const subjectStats = subjects.map(s => {
+                const sTasks = tasks.filter(t => t.subjectId === s.id);
+                const sTotal = sTasks.length;
+                const sCompleted = sTasks.filter(t => t.completed).length;
+                const sPercent = sTotal ? Math.round((sCompleted / sTotal) * 100) : null;
+                return { name: s.name, percent: sPercent, total: sTotal };
+            }).filter(s => s.total > 0);
+
+            if (subjectStats.length) {
+                subjectStats.sort((a, b) => (a.percent === null ? 100 : a.percent) - (b.percent === null ? 100 : b.percent));
+                const weakest = subjectStats[0];
+                if (weakest.percent !== null && weakest.percent < 50) {
+                    lines.push(`Focus on ${weakest.name}: only ${weakest.percent}% completed.`);
+                }
+            }
+        }
+        insightsEl.innerHTML = lines.map(l => `<p>${l}</p>`).join('') || '<p class="empty-state">No insights</p>';
+    }
+}
+
+// helper: render a horizontal bar with label
+function renderBar(container, label, percent, color) {
+    const wrap = document.createElement('div');
+    wrap.className = 'bar-wrap';
+    wrap.innerHTML = `
+        <div class="bar-label"><span>${label}</span><span>${percent}%</span></div>
+        <div class="bar"><div class="bar-fill" style="width:${percent}%; background:${color}"></div></div>
+    `;
+    container.appendChild(wrap);
+}
+
 // functions for Subject Section
 // display all subjects //done
 function displaySubjects() {
