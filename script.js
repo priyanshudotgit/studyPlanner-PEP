@@ -125,7 +125,6 @@ function displayTodaySchedule() {
     } else {
         let html = '';
         for (let i = 0; i < todaySchedules.length; i++) {
-            console.log(todaySchedules[i]);
             let schedule = todaySchedules[i];
             let subject = findSubjectById(schedule.subjectId, subjects);
             let subjectName = subject ? subject.name : 'Unknown Subject';
@@ -807,8 +806,7 @@ function renderScheduleList() {
     container.innerHTML = html;
 }
 
-// Helper to make time look nice (09:00 -> 9:00 AM)
-// If you prefer 24h, you can remove this.
+// for 12hr format
 function formatTime(timeStr) {
     const [hour, minute] = timeStr.split(':');
     const h = parseInt(hour);
@@ -817,7 +815,7 @@ function formatTime(timeStr) {
     return `${h12}:${minute} ${ampm}`;
 }
 
-// Keep your existing Save/Edit logic, just update the render call
+// save schedule function
 function saveSchedule(event) {
     event.preventDefault();
     
@@ -832,10 +830,7 @@ function saveSchedule(event) {
     if (typeof displayDashboard === 'function') displayDashboard();
 }
 
-// Keep your existing open/close modal functions
-// Keep your existing checkScheduleConflict function
-
-// Function to generate time slots from 8 AM to 8 PM
+// generate time slots
 function generateTimeSlots() {
     var slots = [];
     for (var hour = 8; hour <= 20; hour++) {
@@ -844,7 +839,7 @@ function generateTimeSlots() {
     return slots;
 }
 
-// Function to get sessions for a specific day and time
+// get specific sessions
 function getSessionsForDayAndTime(day, time, schedules, subjects) {
     var html = '';
     var hour = parseInt(time.split(':')[0]);
@@ -871,7 +866,7 @@ function getSessionsForDayAndTime(day, time, schedules, subjects) {
     return html;
 }
 
-// Function to open schedule modal
+// open schedule modal
 function openScheduleModal(scheduleId) {
     currentEditingId = scheduleId || null;
     var modal = document.getElementById('schedule-modal');
@@ -897,7 +892,7 @@ function openScheduleModal(scheduleId) {
     modal.classList.add('active');
 }
 
-// Function to save schedule
+// save schedule
 function saveSchedule(event) {
     event.preventDefault();
     
@@ -941,7 +936,7 @@ function saveSchedule(event) {
     displaySchedule();
 }
 
-// Function to check for schedule conflicts
+// check schedule conflicts
 function checkScheduleConflict(day, startTime, endTime, excludeId) {
     var schedules = getFromStorage('schedules') || [];
     
@@ -973,7 +968,20 @@ function checkScheduleConflict(day, startTime, endTime, excludeId) {
     return false;
 }
 
-// Function to edit schedule
+// edit schedule
 function editSchedule(scheduleId) {
     openScheduleModal(scheduleId);
+}
+
+// delete schedule
+function deleteSchedule(scheduleId, event) {
+    event.stopPropagation();
+    if (confirm('Are you sure you want to delete this schedule?')) {
+        var schedules = getFromStorage('schedules') || [];
+        schedules = schedules.filter(s => s.id !== scheduleId);
+        saveToStorage('schedules', schedules);
+        displaySchedule();
+        if (typeof displayDashboard === 'function') displayDashboard();
+        alert('Schedule deleted successfully!');
+    }
 }

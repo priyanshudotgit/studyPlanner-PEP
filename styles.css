@@ -509,6 +509,7 @@ body {
     gap: var(--spacing-lg);
     align-items: start;
     transition: var(--transition);
+    margin-bottom: 8px;
 }
 .schedule-card:hover {
     transform: translateY(-2px);
