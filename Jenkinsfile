@@ -3,6 +3,7 @@ pipeline {
     environment {
         IMAGE_NAME = "my-studyplanner-app"
         IMAGE_TAG = "latest"
+        CONTAINER_NAME = "studyplanner-container"
     }
     stages {
         stage('Checkout Code') {
@@ -12,13 +13,22 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
             }
         }
-        stage('Run Container') {
+        stage('Deploy Container') {
             steps {
-                sh 'docker rm -f my-nginx-container || true'
-                sh 'docker run -d --name my-nginx-container -p 3000:80 ${IMAGE_NAME}:${IMAGE_TAG}'
+                sh "docker rm -f ${CONTAINER_NAME} || true"
+                sh "docker run -d --name ${CONTAINER_NAME} -p 3000:80 ${IMAGE_NAME}:${IMAGE_TAG}"
+            }
+        }
+        stage('Health Check') {
+            steps {
+                script {
+                    echo "Checking if the app is reachable..."
+                    sleep 5
+                    sh "curl -f http://localhost:3000 || exit 1"
+                }
             }
         }
     }
